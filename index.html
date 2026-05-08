@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>超カラフル大学生人生ゲーム</title>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:"Segoe UI",sans-serif;
+  background:
+    linear-gradient(135deg,#ffb8f0,#b8d9ff,#c8ffcb);
+  min-height:100vh;
+  padding:20px;
+}
+
+#game{
+  max-width:1300px;
+  margin:auto;
+  background:white;
+  border-radius:30px;
+  padding:20px;
+  box-shadow:0 15px 40px rgba(0,0,0,.2);
+}
+
+/* HEADER */
+
+#top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+#player{
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.avatar{
+  width:90px;
+  height:90px;
+  border-radius:20px;
+  image-rendering:pixelated;
+  border:5px solid white;
+  box-shadow:0 5px 15px rgba(0,0,0,.2);
+}
+
+#playerInfo h2{
+  font-size:30px;
+}
+
+#playerInfo p{
+  color:#666;
+  font-weight:bold;
+}
+
+#turn{
+  background:#f2e0ff;
+  color:#6f2ac9;
+  padding:15px 30px;
+  border-radius:999px;
+  font-size:25px;
+  font-weight:bold;
+}
+
+/* STATS */
+
+#stats{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+  margin-bottom:20px;
+}
+
+.stat{
+  border-radius:25px;
+  padding:20px;
+  color:white;
+  position:relative;
+  overflow:hidden;
+}
+
+.stat h3{
+  font-size:20px;
+  margin-bottom:10px;
+}
+
+.stat .value{
+  font-size:55px;
+  font-weight:bold;
+}
+
+.money{
+  background:linear-gradient(135deg,#ffd84f,#ffb700);
+}
+
+.study{
+  background:linear-gradient(135deg,#5db5ff,#256dff);
+}
+
+.love{
+  background:linear-gradient(135deg,#ff8bc8,#ff4da0);
+}
+
+.happy{
+  background:linear-gradient(135deg,#83e683,#1fb31f);
+}
+
+/* BACKGROUND */
+
+#scene{
+  height:220px;
+  border-radius:30px;
+  overflow:hidden;
+  position:relative;
+  margin-bottom:20px;
+  background:linear-gradient(#b8dcff,#d9f0ff);
+}
+
+.building{
+  position:absolute;
+  bottom:50px;
+  width:100px;
+  background:#d89050;
+}
+
+.tree{
+  position:absolute;
+  bottom:50px;
+  width:45px;
+  height:45px;
+  background:#2e9c2e;
+  border-radius:50%;
+}
+
+.ground{
+  position:absolute;
+  bottom:0;
+  width:100%;
+  height:50px;
+  background:#b0e080;
+}
+
+.playerToken{
+  position:absolute;
+  bottom:30px;
+  width:70px;
+  height:70px;
+  font-size:60px;
+}
+
+/* EVENT */
+
+#event{
+  background:#fff6d9;
+  border:5px solid #ffcc33;
+  border-radius:30px;
+  padding:25px;
+  margin-bottom:20px;
+}
+
+#eventTitle{
+  font-size:40px;
+  font-weight:bold;
+  color:#9c5b00;
+  margin-bottom:10px;
+}
+
+#eventText{
+  font-size:24px;
+  line-height:1.7;
+}
+
+/* BOARD */
+
+#board{
+  display:grid;
+  grid-template-columns:repeat(10,1fr);
+  gap:10px;
+  margin-bottom:25px;
+}
+
+.cell{
+  aspect-ratio:1/1;
+  border-radius:20px;
+  color:white;
+  padding:8px;
+  position:relative;
+  transition:.2s;
+  border:4px solid rgba(255,255,255,.5);
+}
+
+.cell:hover{
+  transform:scale(1.05);
+}
+
+.cell.active{
+  border:5px solid yellow;
+  transform:scale(1.08);
+}
+
+.cell .icon{
+  font-size:32px;
+}
+
+.cell .label{
+  position:absolute;
+  bottom:10px;
+  left:10px;
+  right:10px;
+  font-size:14px;
+  font-weight:bold;
+}
+
+.cell .num{
+  position:absolute;
+  top:8px;
+  right:10px;
+  font-size:13px;
+}
+
+/* COLORS */
+
+.c1{background:#ffb347;}
+.c2{background:#34c38f;}
+.c3{background:#4b8dff;}
+.c4{background:#ff66b2;}
+.c5{background:#8d47ff;}
+.c6{background:#ff5e57;}
+
+/* CONTROLS */
+
+#controls{
+  background:#f5f2f2;
+  padding:25px;
+  border-radius:30px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+#dice{
+  font-size:70px;
+}
+
+button{
+  padding:20px 40px;
+  border:none;
+  border-radius:999px;
+  font-size:28px;
+  font-weight:bold;
+  background:linear-gradient(135deg,#ff5fd2,#8c4dff);
+  color:white;
+  cursor:pointer;
+  transition:.2s;
+}
+
+button:hover{
+  transform:translateY(-3px);
+}
+
+#log{
+  margin-top:20px;
+  background:#fafafa;
+  border-radius:20px;
+  padding:20px;
+  height:140px;
+  overflow:auto;
+  line-height:1.8;
+}
+
+</style>
+</head>
+<body>
+
+<div id="game">
+
+<div id="top">
+
+<div id="player">
+<img class="avatar" src="https://i.imgur.com/4AiXzf8.png">
+
+<div id="playerInfo">
+<h2>ヒマリ</h2>
+<p>お嬢様・高収入タイプ</p>
+</div>
+</div>
+
+<div id="turn">P1のターン</div>
+
+</div>
+
+<div id="stats">
+
+<div class="stat money">
+<h3>💰 お金</h3>
+<div class="value" id="money">5</div>
+</div>
+
+<div class="stat study">
+<h3>📚 キャリア</h3>
+<div class="value" id="study">50</div>
+</div>
+
+<div class="stat love">
+<h3>💕 恋愛</h3>
+<div class="value" id="love">0</div>
+</div>
+
+<div class="stat happy">
+<h3>😊 幸福度</h3>
+<div class="value" id="happy">50</div>
+</div>
+
+</div>
+
+<div id="scene">
+
+<div class="building" style="left:40px;height:120px;"></div>
+<div class="building" style="left:320px;height:90px;background:#e3c49d;"></div>
+
+<div class="tree" style="left:180px;"></div>
+<div class="tree" style="left:520px;"></div>
+
+<div class="ground"></div>
+
+<div class="playerToken" style="left:500px;">👧</div>
+
+</div>
+
+<div id="event">
+
+<div id="eventTitle">🌟 人生ゲームスタート！</div>
+
+<div id="eventText">
+大学生活を楽しもう！<br>
+恋愛、就活、結婚、転職、子育てまで！？
+</div>
+
+</div>
+
+<div id="board"></div>
+
+<div id="controls">
+
+<div id="dice">🎲</div>
+
+<button onclick="rollDice()">
+サイコロを振る
+</button>
+
+</div>
+
+<div id="log"></div>
+
+</div>
+
+<script>
+
+const cells = [
+
+["👶","誕生","c1"],
+["🎒","小学校","c2"],
+["📚","勉強","c3"],
+["💰","お小遣い","c1"],
+["🌟","才能発見","c5"],
+["🏫","中学","c2"],
+["💌","初恋","c4"],
+["📖","受験","c3"],
+["😱","スランプ","c6"],
+["🎉","合格","c5"],
+
+["🏛️","高校","c2"],
+["💕","片思い","c4"],
+["🎓","大学受験","c3"],
+["💸","バイト","c1"],
+["💑","告白","c4"],
+["🎓","大学","c5"],
+["📊","ゼミ","c2"],
+["💘","恋人","c4"],
+["💼","就活","c1"],
+["🏅","内定","c5"],
+
+["🏢","就職","c3"],
+["📈","昇進","c2"],
+["💵","初任給","c1"],
+["💍","プロポーズ","c4"],
+["😵","残業","c6"],
+["💒","結婚","c5"],
+["👶","子供誕生","c1"],
+["🏠","マイホーム","c2"],
+["💔","夫婦喧嘩","c6"],
+["🌸","子育て","c4"],
+
+["🎒","子供入学","c2"],
+["💡","転職","c3"],
+["🎊","宝くじ","c5"],
+["🤒","病気","c6"],
+["🌳","中年期","c2"],
+["🎓","子供卒業","c3"],
+["🏆","役員","c1"],
+["✈️","旅行","c5"],
+["🌅","老後","c4"],
+["🏁","ゴール","c6"]
+
+];
+
+const events = [
+
+{
+title:"💕 恋人ができた！",
+text:"大学で気になる人と急接近！",
+love:15,
+happy:10
+},
+
+{
+title:"💸 バイト代GET！",
+text:"シフト頑張って稼いだ！",
+money:8,
+happy:5
+},
+
+{
+title:"📚 成績アップ！",
+text:"レポート高評価！",
+study:10,
+happy:6
+},
+
+{
+title:"😱 単位落とした…",
+text:"徹夜したのに試験爆死。",
+study:-12,
+happy:-10
+},
+
+{
+title:"🎊 宝くじ当選！",
+text:"運が良すぎる！！！",
+money:20,
+happy:15
+}
+
+];
+
+const board = document.getElementById("board");
+
+let player = {
+position:0,
+money:5,
+study:50,
+love:0,
+happy:50
+};
+
+function renderBoard(){
+
+board.innerHTML="";
+
+cells.forEach((cell,index)=>{
+
+const div = document.createElement("div");
+
+div.className=`cell ${cell[2]}`;
+
+if(index===player.position){
+div.classList.add("active");
+}
+
+div.innerHTML=`
+
+<div class="num">${index+1}</div>
+
+<div class="icon">${cell[0]}</div>
+
+<div class="label">${cell[1]}</div>
+
+`;
+
+board.appendChild(div);
+
+});
+
+}
+
+function updateStats(){
+
+document.getElementById("money").textContent =
+player.money;
+
+document.getElementById("study").textContent =
+player.study;
+
+document.getElementById("love").textContent =
+player.love;
+
+document.getElementById("happy").textContent =
+player.happy;
+
+}
+
+function addLog(text){
+
+document.getElementById("log").innerHTML =
+text + "<br>" +
+document.getElementById("log").innerHTML;
+
+}
+
+function rollDice(){
+
+const roll =
+Math.floor(Math.random()*6)+1;
+
+const faces =
+["⚀","⚁","⚂","⚃","⚄","⚅"];
+
+document.getElementById("dice").textContent =
+faces[roll-1];
+
+player.position += roll;
+
+if(player.position >= cells.length-1){
+
+player.position = cells.length-1;
+
+document.getElementById("eventTitle").textContent =
+"🎉 人生クリア！";
+
+document.getElementById("eventText").innerHTML = `
+人生お疲れさまでした！<br><br>
+
+💰 ${player.money}万<br>
+📚 ${player.study}<br>
+💕 ${player.love}<br>
+😊 ${player.happy}
+`;
+
+renderBoard();
+updateStats();
+
+return;
+}
+
+const ev =
+events[Math.floor(Math.random()*events.length)];
+
+player.money += ev.money || 0;
+player.study += ev.study || 0;
+player.love += ev.love || 0;
+player.happy += ev.happy || 0;
+
+document.getElementById("eventTitle").textContent =
+ev.title;
+
+document.getElementById("eventText").textContent =
+ev.text;
+
+addLog(ev.title);
+
+renderBoard();
+updateStats();
+
+}
+
+renderBoard();
+updateStats();
+
+</script>
+
+</body>
+</html>
